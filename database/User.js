@@ -1,4 +1,6 @@
 const {Schema, model} = require("mongoose");
+const passwordService = require('../service/password.service');
+// const {passwordService} = require("../service");
 
 const userSchema = new Schema({
     url: {
@@ -37,8 +39,10 @@ const userSchema = new Schema({
 }, {timestamps: true, toObject: {virtuals: true}, toJSON: {virtuals: true}});
 
 userSchema.statics = {
-    async createUser(userObject) {
-        return this.create(userObject);
+    async createUserWithHashPassword(userObject) {
+        const hashedPassword = await passwordService.hash(userObject.password);
+
+        return this.create({...userObject, password: hashedPassword});
     }
 };
 
